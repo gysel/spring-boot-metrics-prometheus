@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  grafana:
+    image: grafana/grafana:6.2.2
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+      - ./grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./grafana/JVM-Micrometer.json:/var/lib/grafana/dashboards/JVM-Micrometer.json
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+
+  prometheus:
+    image: prom/prometheus:v2.10.0
+    ports:
+      - 9090:9090
+    volumes:
+      - /prometheus-data
+      - ./grafana/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  application:
+    image: spring-boot-metrics-prometheus:latest
+    ports:
+      - 8080:8080
